@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"test/helper/utils"
 )
 
 type Cmd struct {
@@ -44,8 +45,49 @@ func (a *ArithCommand) Parse(args []string) error {
 	return a.flags.Parse(args)
 }
 
+func (a *ArithCommand) add() int {
+	args := a.flags.Args()[1 : len(a.flags.Args())-1]
+	fmt.Println(args)
+	sum := 0
+
+	//convert string arr to int arr
+	ret := utils.StrArrToIntArr(args)
+	//sum all numbers
+	for _, num := range ret {
+		sum = sum + num
+	}
+	fmt.Println(sum)
+	return sum
+}
+
+func (a *ArithCommand) subtract() int {
+	if len(a.flags.Args()) > 3 {
+		panic("Oops, I can only subtract 2 numbers!")
+	}
+	args := a.flags.Args()[1:3]
+
+	ret := utils.StrArrToIntArr(args)
+
+	difference := ret[0] - ret[1]
+	fmt.Println(difference)
+	return difference
+
+}
+
 func (a *ArithCommand) Do() error {
-	fmt.Println("Arith")
+
+	fmt.Println(a.flags.Args())
+	switch a.flags.Arg(0) {
+	case "add":
+		// if a.operation != "a" {
+		a.add()
+		// }
+	case "subtract":
+		a.subtract()
+	default:
+		fmt.Println("NAH")
+	}
+	fmt.Println(a.flags.Arg(1))
 	fmt.Println("Options:")
 	fmt.Println(a.operation)
 
@@ -109,7 +151,6 @@ type Commands []Command
 // ------ Main
 func main() {
 	flag.Parse()
-
 	commands := Commands{
 		NewArithCommand(),
 		NewEchoCommand(),
